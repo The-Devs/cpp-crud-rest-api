@@ -44,10 +44,11 @@ class DatabaseConnection {
         string tableName;
         string crud;
         char crudType;
+        bool debug = true;
         // map<string,string> fieldsMap;
         map<string,string> whereConditions;
         string whereJoinner = "=";
-        vector<map<string,string>> orderConditions;
+        map<string,string> orderConditions;
         int pagination = 0;
         int page = 1;
         vector<map<string,string>> rows;
@@ -87,13 +88,35 @@ class DatabaseConnection {
         string prefixIt ( string tableName, string fieldName );
         
         /** 
-         * Preppend prefix on all fields of specific table
+         * Make where sql string to concatanate to crud.
          * 
-         * @param tableName The specific table name
-         * @param fieldNames The {key,value} map, prefixing just keys
-         * @return The provided map with preffixed keys
+         * @return where sql piece of crud.
          */
         string whereHandler ();
+
+        /** 
+         * Make order sql string to concatanate to crud.
+         * 
+         * @return order sql piece of crud.
+         */
+        string orderHandler ();
+
+        /** 
+         * Make order sql string to concatanate to crud.
+         * 
+         * @return order sql piece of crud.
+         */
+        string paginationHandler ();
+
+        /** 
+         * Check if debug is on.
+         * 
+         * @return if debug is on (console messages).
+         */
+        bool isDebugOn ();
+
+        void debugOn ();
+        void debugOff ();
 
     public:
         /** 
@@ -122,6 +145,13 @@ class DatabaseConnection {
          * @param whereConditions {key,value} map with conditions
          */
         void where ( map<string,string> whereConditions );
+        
+        /** 
+         * Set order conditions in sql statement
+         * 
+         * @param orderConditions {key,value} map with conditions
+         */
+        void order ( map<string,string> orderConditions );
 
         /** 
          * Get where conditions of DatabaseConnection
@@ -129,6 +159,13 @@ class DatabaseConnection {
          * @return where conditions {key,value} map
          */
         map<string,string> getWhereConditions ();
+
+        /** 
+         * Get order conditions of DatabaseConnection
+         * 
+         * @return order conditions {key,value} map
+         */
+        map<string,string> getOrderConditions ();
 
         /** 
          * Set string placed between key and value of where conditions
@@ -180,9 +217,9 @@ class DatabaseConnection {
         void setPage ( int page );
 
         /** 
-         * Get current page
+         * Get current page.
          * 
-         * @return Number of resulsts per page
+         * @return Number of current page.
          */
         int getPage ();
 

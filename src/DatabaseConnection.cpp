@@ -21,6 +21,16 @@ using namespace std;
 
 
 // private:
+bool thedevs::DatabaseConnection::isDebugOn () {
+    return this->debug;
+}
+void thedevs::DatabaseConnection::debugOn () {
+    this->debug = true;
+}
+void thedevs::DatabaseConnection::debugOff () {
+    this->debug = false;
+}
+
 void thedevs::DatabaseConnection::setPrefix ( string prefix ) {
     this->prefix = prefix;
 }
@@ -66,6 +76,33 @@ string thedevs::DatabaseConnection::whereHandler () {
     return sql;
 }
 
+string thedevs::DatabaseConnection::orderHandler () {
+    map<string,string> orderConditions = thedevs::DatabaseConnection::getOrderConditions();
+    string prefix = thedevs::DatabaseConnection::getTablePrefix( thedevs::DatabaseConnection::getTableName() );
+    vector<string> vals = plu::Array::array_values( orderConditions );
+    vector<string> keys = plu::Array::array_keys( orderConditions );
+    keys = plu::Array::array_xppend( prefix, keys, true );
+    vector<string> sqlPieces;
+    string keyString;
+    string valString;
+    vector<string>::iterator vIt = vals.begin();
+    for ( vector<string>::iterator kIt = keys.begin(); kIt != keys.end(); kIt++, vIt++ ) {
+        keyString = *kIt;
+        valString = *vIt;
+        sqlPieces.push_back( keyString + " " + valString );
+    }
+    string sql = " ORDER BY ";
+    sql += plu::Array::implode( ", ", sqlPieces );
+    
+    return sql;
+}
+
+string thedevs::DatabaseConnection::paginationHandler () {
+    int pagination = this->getPagination();
+    int offset = ( this->getPage() - 1 ) * pagination;
+    return " LIMIT " + to_string( pagination ) + " OFFSET " + to_string( offset );
+}
+
 // public:
 thedevs::DatabaseConnection::DatabaseConnection( string host, string username, string password, string dbname ) {
     try {
@@ -98,8 +135,16 @@ void thedevs::DatabaseConnection::where ( map<string,string> whereConditions ) {
     this->whereConditions = whereConditions;
 }
 
+void thedevs::DatabaseConnection::order ( map<string,string> orderConditions ) {
+    this->orderConditions = orderConditions;
+}
+
 map<string,string> thedevs::DatabaseConnection::getWhereConditions () {
     return this->whereConditions;
+}
+
+map<string,string> thedevs::DatabaseConnection::getOrderConditions () {
+    return this->orderConditions;
 }
 
 void thedevs::DatabaseConnection::setWhereJoinner ( string whereJoinner ) {
@@ -108,6 +153,14 @@ void thedevs::DatabaseConnection::setWhereJoinner ( string whereJoinner ) {
 
 string thedevs::DatabaseConnection::getWhereJoinner () {
     return this->whereJoinner;
+}
+
+int thedevs::DatabaseConnection::getPagination () {
+    return this->pagination;
+}
+
+int thedevs::DatabaseConnection::getPage () {
+    return this->page;
 }
 
 vector<string> thedevs::DatabaseConnection::getTableFields ( string tableName, bool withPrefix ) {
@@ -181,28 +234,44 @@ void thedevs::DatabaseConnection::Insert ( string tableName, map<string,string> 
     this->setCRUD( "INSERT INTO " + this->getPrefix() + tableName + " (" + sqlFields  + ") VALUES (" + sqlVals  + ")" );
 }
 
+void thedevs::DatabaseConnection::Delete ( string tableName ) {
+    this->setTableName( tableName );
+    this->setCRUDType( 'D' );
+}
+
 bool thedevs::DatabaseConnection::build () {
     if ( this->getTableName() == "" ) return false;
     string tableName = this->getTableName();
-    string sql = this->getCRUD();
     vector<string> fields = this->getTableFields( tableName, true );
     sql::Statement *stmt;
     sql::ResultSet *res;
     map<string,string> row;
     vector<map<string,string>> rows;
 
+    // Fixing Delete request, change between delete and truncate statements
+    if ( this->getCRUDType() == 'D' ) {
+        if ( ! this->getWhereConditions().empty() ) {
+            this->setCRUD( "DELETE FROM " + this->getPrefix() + this->getTableName() );
+        } else {
+            this->setCRUD( "TRUNCATE " + this->getPrefix() + this->getTableName() );
+        }
+    }
+
     try {
+        string sql = this->getCRUD();
         stmt = this->connection->createStatement();
         if ( ! this->getWhereConditions().empty() ) {
             sql += this->whereHandler();
         }
-        // if ( ! this->getOrderConditions().empty() ) {
-        //     sql += this->orderHandler( tableName );
-        // }
-        // if ( this->getPagination() > 0 ) {
-        //     sql += this->paginationHandler( tableName );
-        // }
-        // cout << sql << endl;
+        if ( ! this->getOrderConditions().empty() ) {
+            sql += this->orderHandler();
+        }
+        if ( this->getPagination() > 0 ) {
+            sql += this->paginationHandler();
+        }
+        if ( this->isDebugOn() ) {
+            cout << "Building sql: " << sql << endl;
+        }
         if ( this->getCRUDType() == 'R' ) {
             res = stmt->executeQuery( sql );
             while ( res->next() ) {
@@ -222,6 +291,7 @@ bool thedevs::DatabaseConnection::build () {
         delete stmt;
         return true;
     } catch ( sql::SQLException &e ) {
+        // e.getErrorCode() == 1062
         cout << "# ERR: SQLException in " << __FILE__;
         cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
         cout << "# ERR: " << e.what();
