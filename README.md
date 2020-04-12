@@ -2,18 +2,17 @@
 Uma API REST desenvolvida em C++ para serviço de CRUD (Create, Read, Update, Delete) em banco de dados.
 
 ## Comando e argumentos
-(Todas estas etapas necessitam do item 1 em "Implementações em planejamento")
 Antes de iniciar o servidor CRUD REST API (CRA) devemos configurar um arquivo `.json` com informações do banco de dados:
 
 ~dir/meu_db.json
 ```json
 {
-    "name": "theadmin",
-    "username": "usuario_db",
-    "password": "senha do usuario",
-    "host": "127.0.0.1",
-    "protocol": "tcp",
-    "port": 3306,
+"name":"theadmin",
+"username":"usuario_db",
+"password":"senha do usuario",
+"host":"127.0.0.1",
+"protocol":"tcp",
+"port":"3306",
 }
 ```
 
@@ -29,7 +28,7 @@ $ curl -X DELETE http://localhost:8100
 ```
 Uma mensagem de encerramento será enviada para o console.
 
-Atualmente C++ CRA suporta apenas arquivos `.json` sem espaços ou tabulações. Veja os tópicos 2 e 3 em "Implementações em planejamento" para mais detalhes.
+Atualmente C++ CRA suporta apenas arquivos `.json` **sem espaços ou tabulações**. Veja os tópicos 2 e 3 em "Implementações em planejamento" para mais detalhes.
 
 ## Banco de dados suportados
 * MySQL
@@ -55,7 +54,7 @@ Pessoas que estiveram presente no desenvolvimento do projeto:
     * Suporte a formato TXT.
     * Suporte a formato XML.
 3. Ampliar ferramentas via rotas:
-    * Filtro de leitura com parâmetros query na URL.
+    * ~~Filtro de leitura com parâmetros query na URL.~~
     * Aplicar Trim em entradas json para processos de "sqlização".
 4. Suporte a outros bancos de dados:
     * PostgrSQL.

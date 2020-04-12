@@ -234,6 +234,23 @@ void thedevs::DatabaseConnection::Insert ( string tableName, map<string,string> 
     this->setCRUD( "INSERT INTO " + this->getPrefix() + tableName + " (" + sqlFields  + ") VALUES (" + sqlVals  + ")" );
 }
 
+void thedevs::DatabaseConnection::Update ( string tableName, map<string,string> data ) {
+    string sqlFields, sqlVals;
+    string key, val;
+    vector<string> pairs;
+    for ( map<string,string>::iterator i = data.begin(); i != data.end(); i++ ) {
+        key = this->getTablePrefix( tableName ) + i->first;
+        val = plu::String::str_embrace( "'", i->second );
+        pairs.push_back( key + "=" + val );
+    }
+    
+    string sqlPairs = plu::Array::implode( ",", pairs );
+    
+    this->setTableName( tableName );
+    this->setCRUDType( 'U' );
+    this->setCRUD( "UPDATE " + this->getPrefix() + tableName + " SET " + sqlPairs );
+}
+
 void thedevs::DatabaseConnection::Delete ( string tableName ) {
     this->setTableName( tableName );
     this->setCRUDType( 'D' );
@@ -291,7 +308,7 @@ bool thedevs::DatabaseConnection::build () {
         delete stmt;
         return true;
     } catch ( sql::SQLException &e ) {
-        // e.getErrorCode() == 1062
+        cout << endl;
         cout << "# ERR: SQLException in " << __FILE__;
         cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
         cout << "# ERR: " << e.what();

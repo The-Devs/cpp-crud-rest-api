@@ -30,7 +30,7 @@ thedevs::ResponseTemplate::ResponseTemplate ( string str ) {
 }
 
 string thedevs::ResponseTemplate::build ( int error, vector<map<string,string>> data ) {
-    cout << "error inside: " << to_string( error ) << endl;
+    cout << "ResponseTemplate::build - error: " << to_string( error ) << endl;
     string str = "{";
     str +=  "\"error\":" + to_string( error ) + ",";
     str +=  "\"message\":\"" + this->getMessage( error ) + "\",";
