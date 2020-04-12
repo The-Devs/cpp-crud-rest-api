@@ -4,6 +4,7 @@
 #include <map>
 #include <algorithm>
 #include <typeinfo>
+#include <fstream>
 
 #include "libs/cpp-httplib/httplib.h"
 #include "src/phplike-utils/json.cpp"
@@ -13,22 +14,35 @@
 using namespace std;
 
 int main ( int argc, char** argv ) {
+    if ( argc != 4 ) {
+        if ( argc > 4 ) {
+            cout << "Muitos argumentos inseridos!" << endl;
+        }
+        if ( argc < 4 ) {
+            cout << "Faltam argumentos!" << endl;
+        }
+        cout << "1. Nome do servidor (ex: localhost)" << endl;
+        cout << "2. Porta de acess (ex: 8100)" << endl;
+        cout << "3. Arquivo .json com informações do banco de dados (ex: database.json)" << endl;
+    }
 
-    string username = "enriquerene";
-    string password = "um2tres45";
-    string dbhost = "127.0.0.1";
-    string protocol = "tcp";
-    int dbport = 3306;
-    string host = protocol + "://" + dbhost + ":" + to_string( dbport );
-    string dbname = "theadmin";
-    int port = 8100;
+    fstream dbFile( argv[ 3 ] );
+    if ( ! dbFile.is_open() ) return 1;
+    string line;
+    string jsonString = "";
+    while ( getline( dbFile, line ) ) {
+        jsonString += line;
+    }
+    map<string,string> db = plu::Json::json_decode( jsonString );
+    string host = db[ "protocol" ] + "://" + db[ "host" ] + ":" + db[ "port" ];
+    
 
     string jsonFromFile = "{\"0\":\"Operação realizada com sucesso.\",\"1\":\"Recurso não encontrado.\",\"2\":\"Erro ao utilizar recurso.\",\"3\":\"Senha de acesso inválida.\",\"4\":\"Operação interrompida. Já existe uma instalação anterior.\"}";
 
     httplib::Server svr;
     cout << "Inicializando servidor C++ CRA" << endl;
     thedevs::ResponseTemplate resTemp( jsonFromFile );
-    
+
     svr.Get( "/", []( const httplib::Request& req, httplib::Response& res ) {
         string html = "<a href=\"https://github.com/The-Devs\">The Devs - Desenvolvimento de Software</a>";
         res.set_content( html, "text/html" );
@@ -51,7 +65,7 @@ int main ( int argc, char** argv ) {
         //     tableName = urlPieces[ 0 ];
         //     strParams = urlPieces[ 1 ];
         // }
-        thedevs::DatabaseConnection conn( host, username, password, dbname );
+        thedevs::DatabaseConnection conn( host, db[ "username" ], db[ "password" ], db[ "name" ] );
 
         conn.Select( tableName );
         // where (here)
@@ -65,7 +79,7 @@ int main ( int argc, char** argv ) {
         string tableName = req.matches[1];
         string body;
         vector<map<string,string>> emptyData;
-        thedevs::DatabaseConnection conn( host, username, password, dbname );
+        thedevs::DatabaseConnection conn( host, db[ "username" ], db[ "password" ], db[ "name" ] );
         content_reader( [&]( const char *data, size_t data_length ) {
             body.append( data, data_length );
             return true;
@@ -81,7 +95,7 @@ int main ( int argc, char** argv ) {
     });
     svr.Delete( R"(/crud/(\w+))", [&]( const httplib::Request& req, httplib::Response& res ) {
         string tableName = req.matches[ 1 ];
-        thedevs::DatabaseConnection conn( host, username, password, dbname );
+        thedevs::DatabaseConnection conn( host, db[ "username" ], db[ "password" ], db[ "name" ] );
         conn.Delete( tableName );
         conn.build();
         conn.clear();
@@ -94,7 +108,7 @@ int main ( int argc, char** argv ) {
         string id = req.matches[ 2 ];
         map<string,string> where = { { "id", id } };
         
-        thedevs::DatabaseConnection conn( host, username, password, dbname );
+        thedevs::DatabaseConnection conn( host, db[ "username" ], db[ "password" ], db[ "name" ] );
 
         conn.Select( tableName );
         conn.where( where );
@@ -109,7 +123,7 @@ int main ( int argc, char** argv ) {
         string id = req.matches[ 2 ];
         map<string,string> where = { { "id", id } };
 
-        thedevs::DatabaseConnection conn( host, username, password, dbname );
+        thedevs::DatabaseConnection conn( host, db[ "username" ], db[ "password" ], db[ "name" ] );
         conn.Delete( tableName );
         conn.where( where );
         conn.build();
@@ -121,7 +135,7 @@ int main ( int argc, char** argv ) {
         string tableName = req.matches[1];
         string body;
         vector<map<string,string>> emptyData;
-        thedevs::DatabaseConnection conn( host, username, password, dbname );
+        thedevs::DatabaseConnection conn( host, db[ "username" ], db[ "password" ], db[ "name" ] );
         content_reader( [&]( const char *data, size_t data_length ) {
             body.append( data, data_length );
             return true;
@@ -140,30 +154,13 @@ int main ( int argc, char** argv ) {
     
 
     svr.set_error_handler([](const httplib::Request & /*req*/, httplib::Response &res) {
-        const char *fmt = "<p>Error Status: <span style='color:red;'>%d</span></p>";
+        const char *fmt = "{status:1,message:\"erro 500 final\"}";
         char buf[BUFSIZ];
         snprintf(buf, sizeof(buf), fmt, res.status);
         res.set_content(buf, "text/html");
     });
 
-
-    svr.listen( "localhost", port );
-
-    // get dbinfo and port via argc and argv
-    // if ( argc < 2 ) {
-    //     cout << "Missing table name" << endl;
-    //     // if ( argc < 2 ) {
-    //     //     cout << "Missing table prefix" << endl;
-    //     // }
-    //     return 1;
-    // }
-
-    // string tableName = "firstTable"; // argv[ 1 ];
-
-    
-    // cout << endl;
+    svr.listen( argv[ 1 ], atoi( argv[ 2 ] ) );
 
     return EXIT_SUCCESS;
 }
-// g++ -I /usr/local/include/mysql-connector/include/jdbc/ app.cpp -o crud -lmysqlcppconn
-// g++ -std=c++11 -I /usr/local/include/mysql-connector/include/jdbc/ app.cpp -o crud -lmysqlcppconn -pthread

@@ -29,7 +29,7 @@ $ curl -X DELETE http://localhost:8100
 ```
 Uma mensagem de encerramento será enviada para o console.
 
-Atualmente C++ CRA suporta apenas arquivos `.json`. Veja tópico 2 em "Implementações em planejamento" para mais detalhes.
+Atualmente C++ CRA suporta apenas arquivos `.json` sem espaços ou tabulações. Veja os tópicos 2 e 3 em "Implementações em planejamento" para mais detalhes.
 
 ## Banco de dados suportados
 * MySQL
@@ -44,12 +44,14 @@ Pessoas que estiveram presente no desenvolvimento do projeto:
 
 ## Implementações em planejamento
 1. Lidando com argumentos:
-    * O primeiro argumento deve ser o nome do servidor.
-    * O segundo argumento deve ser a porta de acesso ao servidor.
-    * O terceiro argumento deve ser um arquivo json com as informações do banco de dados
+    * ~~O primeiro argumento deve ser o nome do servidor.~~
+    * ~~O segundo argumento deve ser a porta de acesso ao servidor.~~
+    * ~~O terceiro argumento deve ser um arquivo json com as informações do banco de dados.~~
 2. Lidando com arquivos:
-    * Ler arquivo json e armazenar em map.
-    * Ler map armazenado.
+    * ~~Ler arquivo json e armazenar em map.~~
+    * ~~Ler map armazenado.~~
+    * Suporte a json incluindo arrays.
+    * Suporte a json incluindo objetos.
     * Suporte a formato TXT.
     * Suporte a formato XML.
 3. Ampliar ferramentas via rotas:
