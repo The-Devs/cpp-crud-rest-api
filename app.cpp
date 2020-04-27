@@ -14,6 +14,24 @@
 
 using namespace std;
 
+
+string fileContent ( string fileName ) {
+    cout << "fileContent function" << endl;
+    fstream file( fileName );
+    if ( ! file.is_open() ) {
+        exit( 1 );
+    }
+    string line;
+    string content = "";
+    while ( getline( file, line ) ) {
+        content += line;
+    }
+    file.close();
+    
+    cout << "file closed, read content:  " << content << endl << endl;
+    return content;
+}
+
 int main ( int argc, char** argv ) {
     if ( argc != 4 ) {
         if ( argc > 4 ) {
@@ -25,30 +43,18 @@ int main ( int argc, char** argv ) {
         cout << "1. Nome do servidor (ex: localhost)" << endl;
         cout << "2. Porta de acess (ex: 8100)" << endl;
         cout << "3. Arquivo .json com informações do banco de dados (ex: database.json)" << endl;
+        return 1;
     }
 
     /* Read file argv[ 3 ] */
-    fstream dbFile( argv[ 3 ] );
-    if ( ! dbFile.is_open() ) return 1;
-    string line;
-    string jsonString = "";
-    while ( getline( dbFile, line ) ) {
-        jsonString += line;
-    }
-    dbFile.close();
+    string jsonString = fileContent( argv[ 3 ] );
+
     map<string,string> db = plu::Json::json_decode( jsonString );
     string host = db[ "protocol" ] + "://" + db[ "host" ] + ":" + db[ "port" ];
     
 
     /* Read file response-messages.json */
-    jsonString = "";
-    fstream messagesFile( "response-messages.json" );
-    if ( ! messagesFile.is_open() ) return 1;
-    string jsonFromFile = "";
-    while ( getline( messagesFile, line ) ) {
-        jsonFromFile += line;
-    }
-    messagesFile.close();
+    string jsonFromFile = fileContent( "response-messages.json" );
 
 
     httplib::Server svr;
