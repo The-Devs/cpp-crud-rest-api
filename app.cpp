@@ -62,6 +62,9 @@ int main ( int argc, char** argv ) {
     cout << "Nome do servidor: " << argv[ 1 ] << endl;
     cout << "Porta de acesso: " << argv[ 2 ] << endl;
     cout << "Arquivo para conexão com Banco de dados: " << argv[ 3 ] << endl;
+
+    cout << ( svr.is_running() ?  "O servidor está funcionando.": "O servidor não está funcionando..." ) << endl;
+
     thedevs::ResponseTemplate resTemp( jsonFromFile );
 
     svr.Get( "/", []( const httplib::Request& req, httplib::Response& res ) {
@@ -177,13 +180,18 @@ int main ( int argc, char** argv ) {
         }
     });
 
-    
 
-    svr.set_error_handler( [&](const httplib::Request& req, httplib::Response& res)  {
-        res.set_content( resTemp.build( 5, {} ), "application/json" );
+    svr.set_error_handler( [&]( const httplib::Request& req, httplib::Response& res )  {
+        auto fmt = "Cagada %d!";
+        char buf[ BUFSIZ ];
+        snprintf( buf, sizeof( buf ), fmt, res.status );
+        res.set_content( buf, "text/plain" );
+        // res.set_content( resTemp.build( 5, {} ), "application/json" );
     });
 
+    cout << "Listen to ..." << argv[ 1 ] << ":" << argv[ 2 ] << endl;
     svr.listen( argv[ 1 ], atoi( argv[ 2 ] ) );
 
+    cout << "Finishing..." << endl;
     return EXIT_SUCCESS;
 }

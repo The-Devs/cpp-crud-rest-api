@@ -21,6 +21,7 @@ using namespace std;
 
 // public:
 thedevs::ResponseTemplate::ResponseTemplate ( string str ) {
+    cout << "Instanciando thedevs::ResponseTemplate" << endl;
     map<string,string> m = plu::Json::json_decode( str );
     map<int,string> p;
     for ( map<string,string>::iterator i = m.begin(); i != m.end(); i++ ) {
