@@ -1,5 +1,5 @@
-#ifndef DATABASE_CONNECTION_H
-#define DATABASE_CONNECTION_H
+#ifndef CRA_DATABASE_CONNECTION_H
+#define CRA_DATABASE_CONNECTION_H
 
 #include <vector>
 #include <map>

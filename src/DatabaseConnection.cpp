@@ -1,12 +1,15 @@
-#ifndef TD_DBCONNECTION_CPP
-#define TD_DBCONNECTION_CPP
+#ifndef CRA_DATABASE_CONNECTION_CPP
+#define CRA_DATABASE_CONNECTION_CPP
 
 #include <vector>
 #include <string>
 #include <map>
 #include <algorithm>
 
+#ifndef CRA_DATABASE_CONNECTION_H
 #include "DatabaseConnection.hpp"
+#endif
+
 #include "phplike-utils/arraylike.cpp"
 
 #include "mysql_connection.h"

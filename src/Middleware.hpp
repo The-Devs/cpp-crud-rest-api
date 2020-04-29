@@ -1,5 +1,5 @@
-#ifndef CRA_RESPONSE_TEMPLATE_H
-#define CRA_RESPONSE_TEMPLATE_H
+#ifndef CRA_MIDDLEWARE_H
+#define CRA_MIDDLEWARE_H
 
 #include <vector>
 #include <string>

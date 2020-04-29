@@ -33,19 +33,18 @@ Atualmente C++ CRA suporta apenas arquivos `.json` **sem espaços ou tabulaçõe
 ## Banco de dados suportados
 * MySQL
 
+## Colaboradores
+Pessoas que estiveram presente no desenvolvimento do projeto:
+* [enriquerene](https://github.com/enriquerene) - Planejamento e desenvolvimento.
+
 ## Third-party
 Uma lista de bibliotecas que possibilitaram o desenvolvimento deste projeto da maneira como é hoje:
 * [yhirose/cpp-httplib](https://github.com/yhirose/cpp-httplib)
 
-## Colaboradores
-Pessoas que estiveram presente no desenvolvimento do projeto:
-* [enriquerene](https://github.com/enriquerene)
-
 ## Implementações em planejamento
-1. Lidando com argumentos:
-    * ~~O primeiro argumento deve ser o nome do servidor.~~
-    * ~~O segundo argumento deve ser a porta de acesso ao servidor.~~
-    * ~~O terceiro argumento deve ser um arquivo json com as informações do banco de dados.~~
+1. Middleware:
+    * Privacidade de rotas com usuário básico.
+    * Privacidade de rotas com token.
 2. Lidando com arquivos:
     * ~~Ler arquivo json e armazenar em map.~~
     * ~~Ler map armazenado.~~
@@ -59,7 +58,7 @@ Pessoas que estiveram presente no desenvolvimento do projeto:
 4. Suporte a outros bancos de dados:
     * PostgrSQL.
     * MongoDB.
-5. Suporte a outros formatos de corpo de requisição:
+5. Suporte a outros formatos de corpo na resposta:
     * HTML
     * CSS
     * JS

@@ -1,11 +1,14 @@
-#ifndef TD_RESTEMPLATE_CPP
-#define TD_RESTEMPLATE_CPP
+#ifndef CRA_RESPONSE_TEMPLATE_CPP
+#define CRA_RESPONSE_TEMPLATE_CPP
 
 #include <vector>
 #include <string>
 #include <map>
 
+#ifndef CRA_RESPONSE_TEMPLATE_H
 #include "ResponseTemplate.hpp"
+#endif
+
 #include "phplike-utils/json.cpp"
 // #include "../libs/json-for-modern-cpp/json.hpp"
 
@@ -21,7 +24,7 @@ using namespace std;
 
 // public:
 thedevs::ResponseTemplate::ResponseTemplate ( string str ) {
-    cout << "Instanciando thedevs::ResponseTemplate" << endl;
+    // cout << "Instanciando thedevs::ResponseTemplate" << endl;
     map<string,string> m = plu::Json::json_decode( str );
     map<int,string> p;
     for ( map<string,string>::iterator i = m.begin(); i != m.end(); i++ ) {
@@ -31,7 +34,7 @@ thedevs::ResponseTemplate::ResponseTemplate ( string str ) {
 }
 
 string thedevs::ResponseTemplate::build ( int error, vector<map<string,string>> data ) {
-    cout << "ResponseTemplate::build - error: " << to_string( error ) << endl;
+    // cout << "ResponseTemplate::build - error: " << to_string( error ) << endl;
     string str = "{";
     str +=  "\"error\":" + to_string( error ) + ",";
     str +=  "\"message\":\"" + this->getMessage( error ) + "\",";
